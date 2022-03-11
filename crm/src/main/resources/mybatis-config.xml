@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+    <!--    mybatis的日志信息
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+
+        配置这个属性为 true 可以自动将以下画线方式命名的数据库列映射到
+        Java 对象的驼峰式命名属性
+    -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <!--别名-->
+    <typeAliases>
+        <package name="com.yyh.crm.entity"/>
+    </typeAliases>
+    
+    <!-- 配置分页插件 -->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--分页参数合理化-->
+            <property name="reasonable" value="true"/>
+        </plugin>
+    </plugins>
+
+    <mappers>
+        <!-- 使用package
+                这个包中所有mapper文件一次都能加载完
+        要求
+                mapper文件名称和dao接口名必须完全一样,包括大 小写
+                mapper文件和dao接口必须在同一目录
+        -->
+        <package name="com.yyh.crm.settings.mapper"/>
+    </mappers>
+</configuration>
