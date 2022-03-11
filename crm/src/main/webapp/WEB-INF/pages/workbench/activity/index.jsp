@@ -15,8 +15,20 @@
 <script type="text/javascript">
 
 	$(function(){
+		$('.mydate').datetimepicker({
+			language : 'zh-CN',
+			format : 'yyyy-mm-dd',
+			minView : 'month',
+			initialDate : new Date(),
+			autoclose : true,
+			todayBtn : true,
+			clearBtn : true
+		})
+
 		$('#createActivityBtn').click(function(){
-			$('#createActivityBtn').modal('show')
+			//清空表单
+			$('#createActivityForm')[0].reset()
+			$('#createActivityModal').modal('show')
 		})
 
 		$('#saveCreateActivityBtn').click(function(){
@@ -26,7 +38,7 @@
 			let startDate = $('#create-startDate').val()
 			let endDate = $('#create-endDate').val()
 			let cost = $.trim($('#create-cost').val())
-			let describe = $.trim($('#create-describe').val())
+			let description = $.trim($('#create-describe').val())
 			//表单验证
 			if(owner === ''){
 				alert('所有者不能为空')
@@ -42,9 +54,32 @@
 					return
 				}
 			}
-			if(cost < 0){
-
+			let regExp = /^(([1-9]\d*)|0)$/
+			if(!regExp.test(cost)){
+				alert('成本只能是非负整数')
+				return
 			}
+			$.ajax({
+				url : '${pageContext.request.contextPath}/workbench/activity/saveCreateActivity.do',
+				data : {
+					owner : owner,
+					name : name,
+					startDate : startDate,
+					endDate : endDate,
+					cost : cost,
+					description : description
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function(data){
+					if(data.code === '1'){
+						$('#createActivityModal').modal('hide')
+					}else{
+						alert(data.message)
+						$('#createActivityModal').modal('show')
+					}
+				}
+			})
 		})
 	});
 	
@@ -64,7 +99,7 @@
 				</div>
 				<div class="modal-body">
 				
-					<form class="form-horizontal" role="form">
+					<form class="form-horizontal" role="form" id="createActivityForm">
 					
 						<div class="form-group">
 							<label for="create-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
@@ -84,11 +119,11 @@
 						<div class="form-group">
 							<label for="create-startDate" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-startDate">
+								<input type="text" class="form-control mydate" id="create-startDate" readonly>
 							</div>
-							<label for="create-endDate" class="col-sm-2 control-label">结束日期</label>
+							<label for="create-endDate" class="col-sm-2 control-label" readonly="">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-endDate">
+								<input type="text" class="form-control mydate" id="create-endDate">
 							</div>
 						</div>
                         <div class="form-group">

@@ -11,6 +11,7 @@ import com.yyh.crm.workbench.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +45,7 @@ public class ActivityController {
         return "workbench/activity/index";
     }
 
-    @RequestMapping("/workbench/activity/saveCreateActivity.do")
+    @RequestMapping(value = "/workbench/activity/saveCreateActivity.do",method = RequestMethod.POST)
     @ResponseBody
     public Object saveCreateActivity(Activity activity, HttpSession session){
         User user = (User)session.getAttribute(Contants.SESSION_USER);
