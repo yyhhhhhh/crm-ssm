@@ -15,9 +15,37 @@
 <script type="text/javascript">
 
 	$(function(){
-		
-		
-		
+		$('#createActivityBtn').click(function(){
+			$('#createActivityBtn').modal('show')
+		})
+
+		$('#saveCreateActivityBtn').click(function(){
+			//收集参数
+			let owner = $('#create-marketActivityOwner').val()
+			let name = $.trim($('#create-marketActivityName').val())
+			let startDate = $('#create-startDate').val()
+			let endDate = $('#create-endDate').val()
+			let cost = $.trim($('#create-cost').val())
+			let describe = $.trim($('#create-describe').val())
+			//表单验证
+			if(owner === ''){
+				alert('所有者不能为空')
+				return
+			}
+			if(name === ''){
+				alert('用户名不能为空')
+				return
+			}
+			if(startDate !== '' && endDate !== ''){
+				if(startDate > endDate){
+					alert('开始日期不能比结束日期大')
+					return
+				}
+			}
+			if(cost < 0){
+
+			}
+		})
 	});
 	
 </script>
@@ -54,13 +82,13 @@
 						</div>
 						
 						<div class="form-group">
-							<label for="create-startTime" class="col-sm-2 control-label">开始日期</label>
+							<label for="create-startDate" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-startTime">
+								<input type="text" class="form-control" id="create-startDate">
 							</div>
-							<label for="create-endTime" class="col-sm-2 control-label">结束日期</label>
+							<label for="create-endDate" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-endTime">
+								<input type="text" class="form-control" id="create-endDate">
 							</div>
 						</div>
                         <div class="form-group">
@@ -82,7 +110,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="saveCreateActivityBtn">保存</button>
 				</div>
 			</div>
 		</div>
@@ -239,7 +267,7 @@
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
-				  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createActivityModal"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+				  <button type="button" class="btn btn-primary" data-target="#createActivityModal" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>

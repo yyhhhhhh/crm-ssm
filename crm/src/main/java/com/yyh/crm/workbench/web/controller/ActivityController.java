@@ -65,8 +65,7 @@ public class ActivityController {
             returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
             returnObject.setMessage(Contants.FAIL_INFO);
         }
-
-        return null;
+        return returnObject;
     }
 
 }
