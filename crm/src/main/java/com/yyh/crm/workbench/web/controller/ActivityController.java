@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author yyh
@@ -69,4 +67,22 @@ public class ActivityController {
         return returnObject;
     }
 
+    @RequestMapping(value = "/workbench/activity/queryActivityByConditionForPage.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Object queryActivityByConditionForPage(String name,String owner,String startDate,String endDate,int pageNo,int pageSize){
+        Map<String,Object> map = new HashMap<>();
+        map.put("name",name);
+        map.put("owner",owner);
+        map.put("startDate",startDate);
+        map.put("endDate",endDate);
+        map.put("beginNo",(pageNo-1)*pageSize);
+        map.put("pageSize",pageSize);
+        List<Activity> list = activityService.queryActivityByConditionForPage(map);
+        int totalRows = activityService.queryCountOfActivityByCondition(map);
+        //生成响应信息
+        Map<String,Object> reusltMap =  new HashMap<>();
+        reusltMap.put("activityList",list);
+        reusltMap.put("totalRows",totalRows);
+        return reusltMap;
+    }
 }
