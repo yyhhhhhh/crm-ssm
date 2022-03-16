@@ -85,4 +85,24 @@ public class ActivityController {
         reusltMap.put("totalRows",totalRows);
         return reusltMap;
     }
+
+    @RequestMapping(value = "/workbench/activity/deleteActivityIds.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Object deleteActivityIds(String[] id){
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            int result = activityService.deleteActivityByIds(id);
+            if(result > 0) {
+                returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+            }else{
+                returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage(Contants.FAIL_INFO);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage(Contants.FAIL_INFO);
+        }
+        return returnObject;
+    }
 }

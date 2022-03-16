@@ -18,6 +18,46 @@
 <script type="text/javascript">
 
 	$(function(){
+		//全选按钮
+		$('#checkAll').click(function(){
+			$('#tbody input[type="checkbox"]').prop('checked',this.checked)
+		})
+
+		//单个按钮 父选择器.on(,子选择器,)
+		$('#tBody').on('click','input[type="checkbox"]',function(){
+			let flag = $('#tbody input[type="checkbox"]').size() === $('#tbody input[type="checkbox"]:checked').size()
+			$('#checkAll').prop('checked',flag)
+		})
+
+		//删除按钮
+		$('#deleteActivityBtn').click(function(){
+			//获取选中checkbox的value值
+			let checkedIds = $('#tbody input[type="checkbox"]:checked')
+			if(checkedIds.size() === 0){
+				alert('请选择要删除的市场活动')
+				return
+			}
+			if(window.confirm("确定删除?")){
+				let ids = ''
+				$.each(checkedIds,function(){
+					ids += 'id=' + this.value + '&'
+				})
+				ids = ids.substring(0,ids.length)
+				$.ajax({
+					url : '${pageContext.request.contextPath}/workbench/activity/deleteActivityIds.do',
+					data : ids,
+					type : 'post',
+					dataType : 'json',
+					success : function(data){
+						if(data.code === '1'){
+							queryActivityByConditionForPage(1,$('#page').bs_pagination('getOption','rowsPerPage'))
+						}
+					}
+				})
+			}
+		})
+
+		//日历
 		$('.mydate').datetimepicker({
 			language : 'zh-CN',
 			format : 'yyyy-mm-dd',
@@ -128,6 +168,7 @@
 					htmlStr += '<td>'+ obj.endDate +'</td></tr>'
 				})
 				$('#tBody').html(htmlStr)
+				$('#checkAll').prop('checked',false)
 				//总页数
 				let totalPages = 1
 				if(data.totalRows % pageSize === 0) {
@@ -373,7 +414,7 @@
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" data-target="#createActivityModal" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-danger" id="deleteActivityBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				<div class="btn-group" style="position: relative; top: 18%;">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#importActivityModal" ><span class="glyphicon glyphicon-import"></span> 上传列表数据（导入）</button>
@@ -385,7 +426,7 @@
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="checkAll"/></td>
 							<td>名称</td>
                             <td>所有者</td>
 							<td>开始日期</td>
