@@ -45,4 +45,18 @@ public interface ActivityMapper {
      * @return
      */
     int deleteActivityByIds(String[] ids);
+
+    /**
+     * 根据id查询市场活动的信息
+     * @param id
+     * @return
+     */
+    Activity selectActivityById(String id);
+
+    /**
+     * 根据id修改市场活动信息
+     * @param activity
+     * @return
+     */
+    int updateActivityById(Activity activity);
 }

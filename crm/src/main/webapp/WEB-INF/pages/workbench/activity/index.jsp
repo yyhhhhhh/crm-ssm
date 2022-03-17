@@ -57,6 +57,94 @@
 			}
 		})
 
+		//修改按钮
+		$('#editActivityBtn').click(function(){
+			//获取被选中的checkbox
+			let checkedIds = $('#tbody input[type="checkbox"]:checked')
+			if(checkedIds.size() === 0){
+				alert('请选择要修改的市场活动')
+				return
+			}
+			if(checkedIds.size() > 1){
+				alert('只能修改一条市场活动')
+				return
+			}
+			//checkedIds.get(0).value
+			//checkedIds[0].value
+			let id = checkedIds.val()
+			$.ajax({
+				url : '${pageContext.request.contextPath}/workbench/activity/queryActivityById.do',
+				data : {
+					id : id
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function(data){
+					$('#edit-id').val(data.id)
+					$('#edit-marketActivityOwner').val(data.owner)
+					$('#edit-marketActivityName').val(data.name)
+					$('#edit-startTime').val(data.startDate)
+					$('#edit-endTime').val(data.endDate)
+					$('#edit-cost').val(data.cost)
+					$('#edit-describe').val(data.description)
+					$('#editActivityModal').modal('show')
+				}
+			})
+		})
+
+		//更新按钮
+		$('#updateActivityBtn').click(function(){
+			let id = $('#edit-id').val()
+			let owner = $('#edit-marketActivityOwner').val()
+			let name = $.trim($('#edit-marketActivityName').val())
+			let startDate = $('#edit-startTime').val()
+			let endDate = $('#edit-endTime').val()
+			let cost = $.trim($('#edit-cost').val())
+			let description = $.trim($('#edit-describe').val())
+			if(owner === ''){
+				alert('所有者不能为空')
+				return
+			}
+			if(name === ''){
+				alert('用户名不能为空')
+				return
+			}
+			if(startDate !== '' && endDate !== ''){
+				if(startDate > endDate){
+					alert('开始日期不能比结束日期大')
+					return
+				}
+			}
+			let regExp = /^(([1-9]\d*)|0)$/
+			if(!regExp.test(cost)){
+				alert('成本只能是非负整数')
+				return
+			}
+			$.ajax({
+				url : '${pageContext.request.contextPath}/workbench/activity/updateActivityById.do',
+				data : {
+					id : id,
+					owner : owner,
+					name : name,
+					startDate : startDate,
+					endDate : endDate,
+					cost : cost,
+					description : description
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function(data){
+					if(data.code === '1'){
+						$('#editActivityModal').modal('hide')
+						queryActivityByConditionForPage($('#page').bs_pagination('getOption','currentPage'),$('#page').bs_pagination('getOption','rowsPerPage'))
+					}else{
+						alert(data.message)
+						$('#editActivityModal').modal('show')
+					}
+				}
+			})
+		})
+
 		//日历
 		$('.mydate').datetimepicker({
 			language : 'zh-CN',
@@ -231,9 +319,9 @@
 							<div class="col-sm-10" style="width: 300px;">
 								<input type="text" class="form-control mydate" id="create-startDate" readonly>
 							</div>
-							<label for="create-endDate" class="col-sm-2 control-label" readonly="">结束日期</label>
+							<label for="create-endDate" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control mydate" id="create-endDate">
+								<input type="text" class="form-control mydate" id="create-endDate" readonly>
 							</div>
 						</div>
                         <div class="form-group">
@@ -274,7 +362,7 @@
 				<div class="modal-body">
 				
 					<form class="form-horizontal" role="form">
-					
+						<input type="hidden" id="edit-id">
 						<div class="form-group">
 							<label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
@@ -293,11 +381,11 @@
 						<div class="form-group">
 							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
+								<input type="text" class="form-control mydate" id="edit-startTime" value="2020-10-10" readonly>
 							</div>
 							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
+								<input type="text" class="form-control mydate" id="edit-endTime" value="2020-10-20" readonly>
 							</div>
 						</div>
 						
@@ -320,7 +408,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" id="updateActivityBtn">更新</button>
 				</div>
 			</div>
 		</div>
@@ -412,8 +500,8 @@
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
-				  <button type="button" class="btn btn-primary" data-target="#createActivityModal" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-primary" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+				  <button type="button" class="btn btn-default" id="editActivityBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger" id="deleteActivityBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				<div class="btn-group" style="position: relative; top: 18%;">

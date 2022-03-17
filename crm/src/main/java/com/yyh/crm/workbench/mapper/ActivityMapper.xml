@@ -221,4 +221,39 @@
         #{id}
     </foreach>
   </delete>
+  <select id="selectActivityById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from tbl_activity
+    where id = #{id}
+  </select>
+  <update id="updateActivityById" parameterType="com.yyh.crm.workbench.entity.Activity">
+    update tbl_activity
+    <set>
+    <if test="owner != null">
+      owner = #{owner},
+    </if>
+    <if test="name != null">
+      name = #{name},
+    </if>
+    <if test="startDate != null">
+      start_date = #{startDate},
+    </if>
+    <if test="endDate != null">
+      end_date = #{endDate},
+    </if>
+    <if test="cost != null">
+      cost = #{cost},
+    </if>
+    <if test="description != null">
+      description = #{description},
+    </if>
+      <if test="createBy != null">
+        create_by = #{createBy},
+      </if>
+      <if test="editTime != null">
+      edit_time = #{editTime},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
 </mapper>

@@ -105,4 +105,34 @@ public class ActivityController {
         }
         return returnObject;
     }
+
+    @RequestMapping(value = "/workbench/activity/queryActivityById.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Object queryActivityById(String id){
+        Activity activity = activityService.queryActivityById(id);
+        return activity;
+    }
+
+    @RequestMapping(value = "/workbench/activity/updateActivityById.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Object updateActivityById(Activity activity,HttpSession session){
+        activity.setEditTime(DateUtils.formatDateTime(new Date()));
+        User user = (User) session.getAttribute(Contants.SESSION_USER);
+        activity.setEditBy(user.getId());
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            int result = activityService.saveEditActivityById(activity);
+            if(result > 0){
+                returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+            }else{
+                returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+                returnObject.setMessage(Contants.FAIL_INFO);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage(Contants.FAIL_INFO);
+        }
+        return returnObject;
+    }
 }
