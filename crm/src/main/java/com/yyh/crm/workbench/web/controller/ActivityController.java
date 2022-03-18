@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.*;
 
 /**
@@ -134,5 +138,22 @@ public class ActivityController {
             returnObject.setMessage(Contants.FAIL_INFO);
         }
         return returnObject;
+    }
+
+    //测试下载
+    @RequestMapping(value = "/workbench/activity/fileDownload.do")
+    public void fileDownload(HttpServletResponse response) throws Exception{
+        response.setContentType("application/octet-stream;charset=utf-8");
+        //直接激活文件下载窗口
+        response.addHeader("Content-Disposition","attachment;filename=myStudentList.xls");
+        OutputStream out = response.getOutputStream();//谁new谁关
+        InputStream in = new FileInputStream("/Users/yyh/Documents/serverDir/studentList.xls");
+        byte [] bytes = new byte[256];
+        int count = 0;
+        while((count = in.read(bytes)) != -1){
+            out.write(bytes,0,count);
+        }
+        in.close();
+        out.flush();
     }
 }

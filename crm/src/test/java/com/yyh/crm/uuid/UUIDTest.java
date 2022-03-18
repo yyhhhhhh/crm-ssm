@@ -1,4 +1,4 @@
-package com.yyh.crm;
+package com.yyh.crm.uuid;
 
 import org.junit.Test;
 
