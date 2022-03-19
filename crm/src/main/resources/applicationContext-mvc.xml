@@ -16,6 +16,14 @@
 
     <mvc:annotation-driven/>
 
+    <!--
+        springmvc 文件解析器
+    -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="#{1024*1024*5}"/>
+        <property name="defaultEncoding" value="utf-8"/>
+    </bean>
+
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/settings/**"/>

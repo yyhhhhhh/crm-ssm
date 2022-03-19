@@ -3,23 +3,27 @@ package com.yyh.crm.workbench.web.controller;
 import com.yyh.crm.commons.contants.Contants;
 import com.yyh.crm.commons.entity.ReturnObject;
 import com.yyh.crm.commons.utils.DateUtils;
+import com.yyh.crm.commons.utils.HSSFUtils;
 import com.yyh.crm.commons.utils.UUIDUtils;
 import com.yyh.crm.settings.entity.User;
 import com.yyh.crm.settings.service.UserService;
 import com.yyh.crm.workbench.entity.Activity;
 import com.yyh.crm.workbench.service.ActivityService;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -140,7 +144,43 @@ public class ActivityController {
         return returnObject;
     }
 
-    //测试下载
+    @RequestMapping(value = "/workbench/activity/exportAllActivities.do")
+    public void exportAllActivities(HttpServletResponse response) throws Exception{
+        List<Activity> list = activityService.queryAllActivities();
+        HSSFWorkbook wb = HSSFUtils.exportActivitiesOrByIds(list);
+        response.setContentType("application/octet-stream;charset=utf-8");
+        response.addHeader("Content-Disposition","attachment;filename=activityList.xls");
+        OutputStream out = response.getOutputStream();
+        wb.write(out);
+        out.flush();
+        wb.close();
+    }
+
+    @RequestMapping(value = "/workbench/activity/exportActivitiesByIds.do")
+    public void exportActivitiesByIds(String[] id,HttpServletResponse response)throws Exception{
+        List<Activity> list = activityService.queryActivitiesByIds(id);
+        HSSFWorkbook wb = HSSFUtils.exportActivitiesOrByIds(list);
+        response.setContentType("application/octet-stream;charset=utf-8");
+        response.addHeader("Content-Disposition","attachment;filename=activityList.xls");
+        OutputStream out = response.getOutputStream();
+        wb.write(out);
+        out.flush();
+        wb.close();
+    }
+
+    /*
+    @RequestMapping(value = "/workbench/activity/fileUpload.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Object fileUpload(String userName, MultipartFile myFile) throws Exception{
+        System.out.println("userName="+userName);
+        myFile.transferTo(new File("/Users/yyh/Documents/serverDir/abc.xls"));
+        ReturnObject returnObject = new ReturnObject();
+        returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+        returnObject.setMessage("上传成功");
+        return returnObject;
+    }*/
+
+    /* 测试下载
     @RequestMapping(value = "/workbench/activity/fileDownload.do")
     public void fileDownload(HttpServletResponse response) throws Exception{
         response.setContentType("application/octet-stream;charset=utf-8");
@@ -155,5 +195,5 @@ public class ActivityController {
         }
         in.close();
         out.flush();
-    }
+    }*/
 }

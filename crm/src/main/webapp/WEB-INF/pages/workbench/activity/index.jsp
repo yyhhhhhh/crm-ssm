@@ -18,6 +18,27 @@
 <script type="text/javascript">
 
 	$(function(){
+		//批量导出
+		$('#exportActivityAllBtn').click(function(){
+			window.location.href =
+					'${pageContext.request.contextPath}/workbench/activity/exportAllActivities.do'
+		})
+
+		//选择导出
+		$('#exportActivityXzBtn').click(function(){
+			let checkedIds = $('#tbody input[type="checkbox"]:checked')
+			if(checkedIds.size() === 0){
+				alert('请选择要删除的市场活动')
+				return
+			}
+			let ids = ''
+			$.each(checkedIds,function(){
+				ids += 'id=' + this.value + '&'
+			})
+			ids = ids.substring(0,ids.length)
+			window.location.href = '${pageContext.request.contextPath}/workbench/activity/exportActivitiesByIds.do?'+ids
+		})
+
 		//全选按钮
 		$('#checkAll').click(function(){
 			$('#tbody input[type="checkbox"]').prop('checked',this.checked)

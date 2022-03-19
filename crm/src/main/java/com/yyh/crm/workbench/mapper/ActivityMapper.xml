@@ -256,4 +256,26 @@
     </set>
     where id = #{id}
   </update>
+  <select id="selectAllActivities" resultMap="BaseResultMap">
+    select a.id,u.name as 'owner',a.name,a.start_date,a.end_date,a.cost,a.description,
+           a.create_time,u1.name as 'create_by',a.edit_time,u2.name as 'edit_by'
+    from tbl_activity a
+           join tbl_user u on a.owner = u.id
+           join tbl_user u1 on a.create_by = u1.id
+           left join tbl_user u2 on a.edit_by = u2.id
+    order by a.create_time desc
+  </select>
+  <select id="selectAllActivitiesByIds" parameterType="string" resultMap="BaseResultMap">
+    select a.id,u.name as 'owner',a.name,a.start_date,a.end_date,a.cost,a.description,
+           a.create_time,u1.name as 'create_by',a.edit_time,u2.name as 'edit_by'
+    from tbl_activity a
+           join tbl_user u on a.owner = u.id
+           join tbl_user u1 on a.create_by = u1.id
+           left join tbl_user u2 on a.edit_by = u2.id
+    where a.id in
+    <foreach collection="array" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+    order by a.create_time desc
+  </select>
 </mapper>
