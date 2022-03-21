@@ -18,6 +18,45 @@
 <script type="text/javascript">
 
 	$(function(){
+		//导入文件
+		$('#importActivityBtn').click(function(){
+			let activityFileName = $('#activityFile').val()
+			let suffix =  activityFileName.substr(activityFileName.lastIndexOf('.')+1).toLocaleLowerCase()
+			if(suffix !== 'xls'){
+				alert('只支持excel文件')
+				return
+			}
+			let activityFile = $('#activityFile')[0].files[0]
+			if(activityFile.size > 1024*2024*5){
+				alert('文件大小不能超过5M')
+				return
+			}
+			//FormData 不仅能提交文本数据,还能提交二进制数据 ajax提供的接口
+			let formData = new FormData()
+			formData.append('activityFile',activityFile)
+			$.ajax({
+				url : '${pageContext.request.contextPath}/workbench/activity/importActivities.do',
+				data : formData,
+				processData : false, //设置ajax提交参数之前,是否把参数同意转成字符串,默认true 是
+				contentType : false, //设置ajax提交参数之前,是否把参数按照urlencoded编码,默认true 是
+				type : 'post',
+				dataType : 'json',
+				success : function(data){
+					if(data.code === '1'){
+						alert('成功导入'+data.retData+'条记录')
+						$('#importActivityModal').modal('hide')
+						queryActivityByConditionForPage(1,$('#page').bs_pagination('getOption','rowsPerPage'))
+					}else{
+						alert(data.message)
+						$('#importActivityModal').modal('show')
+					}
+				},
+				error : function(result){
+					alert('未知错误')
+				}
+			})
+		})
+
 		//批量导出
 		$('#exportActivityAllBtn').click(function(){
 			window.location.href =

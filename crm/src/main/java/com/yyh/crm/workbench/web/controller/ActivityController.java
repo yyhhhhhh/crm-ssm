@@ -13,6 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -166,6 +167,56 @@ public class ActivityController {
         wb.write(out);
         out.flush();
         wb.close();
+    }
+
+    @RequestMapping(value = "/workbench/activity/importActivities.do",method = RequestMethod.POST)
+    @ResponseBody
+    public Object importActivities(MultipartFile activityFile,HttpSession session){
+        User user = (User)session.getAttribute(Contants.SESSION_USER);
+        ReturnObject returnObject = new ReturnObject();
+        try {
+            activityFile.transferTo(new File("/Users/yyh/Documents/serverDir/", activityFile.getOriginalFilename()));
+            InputStream in = new FileInputStream("/Users/yyh/Documents/serverDir/"+activityFile.getOriginalFilename());
+            HSSFWorkbook wb = new HSSFWorkbook(in);
+            HSSFSheet sheet = wb.getSheetAt(0);
+            HSSFRow row = null;
+            HSSFCell cell = null;
+            Activity activity = null;
+            CellType cellType = null;
+            List<Activity> activityList = new ArrayList<>();
+            for(int i=1;i<=sheet.getLastRowNum();i++){
+                row = sheet.getRow(i);
+                activity = new Activity();
+                activity.setId(UUIDUtils.getUUID());
+                activity.setOwner(user.getId());
+                activity.setCreateTime(DateUtils.formatDateTime(new Date()));
+                activity.setCreateBy(user.getId());
+                for(int j=0;j< row.getLastCellNum();j++){
+                    cell = row.getCell(j);
+                    cellType = cell.getCellType();
+                    if(j == 0){
+                        activity.setName(HSSFUtils.getCellValueForStr(cell,cellType));
+                    }else if(j == 1){
+                        activity.setStartDate(HSSFUtils.getCellValueForStr(cell,cellType));
+                    }else if(j == 2){
+                        activity.setEndDate(HSSFUtils.getCellValueForStr(cell,cellType));
+                    }else if(j == 3){
+                        activity.setCost(HSSFUtils.getCellValueForStr(cell,cellType));
+                    }else if(j == 4){
+                        activity.setDescription(HSSFUtils.getCellValueForStr(cell,cellType));
+                    }
+                }
+                activityList.add(activity);
+            }
+            int result = activityService.saveCreateActivityByList(activityList);
+            returnObject.setCode(Contants.RETURN_OBJECT_CODE_SUCCESS);
+            returnObject.setRetData(result);
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Contants.RETURN_OBJECT_CODE_FAIL);
+            returnObject.setMessage(Contants.FAIL_INFO);
+        }
+        return returnObject;
     }
 
     /*
