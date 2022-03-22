@@ -8,6 +8,8 @@ import com.yyh.crm.commons.utils.UUIDUtils;
 import com.yyh.crm.settings.entity.User;
 import com.yyh.crm.settings.service.UserService;
 import com.yyh.crm.workbench.entity.Activity;
+import com.yyh.crm.workbench.entity.ActivityRemark;
+import com.yyh.crm.workbench.service.ActivityRemarkService;
 import com.yyh.crm.workbench.service.ActivityService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -37,11 +39,13 @@ public class ActivityController {
 
     private UserService userService;
     private ActivityService activityService;
+    private ActivityRemarkService activityRemarkService;
 
     @Autowired
-    public ActivityController(UserService userService,ActivityService activityService){
+    public ActivityController(UserService userService,ActivityService activityService,ActivityRemarkService activityRemarkService){
         this.userService = userService;
         this.activityService = activityService;
+        this.activityRemarkService = activityRemarkService;
     }
 
 
@@ -118,8 +122,7 @@ public class ActivityController {
     @RequestMapping(value = "/workbench/activity/queryActivityById.do",method = RequestMethod.POST)
     @ResponseBody
     public Object queryActivityById(String id){
-        Activity activity = activityService.queryActivityById(id);
-        return activity;
+        return activityService.queryActivityById(id);
     }
 
     @RequestMapping(value = "/workbench/activity/updateActivityById.do",method = RequestMethod.POST)
@@ -175,9 +178,7 @@ public class ActivityController {
         User user = (User)session.getAttribute(Contants.SESSION_USER);
         ReturnObject returnObject = new ReturnObject();
         try {
-            activityFile.transferTo(new File("/Users/yyh/Documents/serverDir/", activityFile.getOriginalFilename()));
-            InputStream in = new FileInputStream("/Users/yyh/Documents/serverDir/"+activityFile.getOriginalFilename());
-            HSSFWorkbook wb = new HSSFWorkbook(in);
+            HSSFWorkbook wb = new HSSFWorkbook(activityFile.getInputStream());
             HSSFSheet sheet = wb.getSheetAt(0);
             HSSFRow row = null;
             HSSFCell cell = null;
@@ -217,6 +218,15 @@ public class ActivityController {
             returnObject.setMessage(Contants.FAIL_INFO);
         }
         return returnObject;
+    }
+
+    @RequestMapping(value = "/workbench/activity/detailActivity.do")
+    public String detailActivity(String id,HttpServletRequest request){
+        Activity activity = activityService.queryActivityForDetailById(id);
+        List<ActivityRemark> remarkList = activityRemarkService.queryActivityRemarkForDetailByActivityId(id);
+        request.setAttribute("activity",activity);
+        request.setAttribute("remarkList",remarkList);
+        return "/workbench/activity/detail";
     }
 
     /*
